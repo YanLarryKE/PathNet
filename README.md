@@ -19,12 +19,6 @@ The package supports two common settings:
 - gene and miRNA expression data, where a user-supplied interaction graph can
   constrain the hidden layers.
 
-Representative retained networks from the manuscript examples are shown below.
-
-![COVID metabolomics retained network](docs/figures/covid_metabolomics_network.png)
-
-![BRCA gene/miRNA retained network](docs/figures/brca_gene_mirna_network.png)
-
 The repository also contains the controlled simulation example used to evaluate
 whether the known graph can recover a designed signal.
 
@@ -124,4 +118,3 @@ the source graph for interpretation outside the feed-forward model.
 - The notebooks are analysis examples rather than a polished command-line
   interface. The public API is currently centered on `data_preprocessing`,
   `load_knowledge_graph`, and `sparse_nn`.
-
