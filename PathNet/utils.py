@@ -12,13 +12,13 @@ import random
 # Macos
 # package_dir = "/Users/watertank/Desktop/SPARSENN/Modified_model/PathNet"
 
-# Server
-package_dir = "/home/keyan/phynn/knowledge_informed_ml/PathNet"
-# package_dir = os.path.abspath(os.path.dirname(__file__))
+# Package directory. Keep this relative to the installed package so PathNet does
+# not depend on a user-specific checkout path.
+package_dir = os.path.abspath(os.path.dirname(__file__))
 
 
 zip_path = os.path.join(package_dir, 'data', 'kegg.txt.zip')
-output_dir = "data/"
+output_dir = os.path.join(package_dir, "data")
 
 # Check if the zip file exists
 if os.path.exists(zip_path):
@@ -26,9 +26,94 @@ if os.path.exists(zip_path):
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         # Extract all the files
         zip_ref.extractall(output_dir)
-    os.remove(zip_path)
 
 #################### Function for data pre-processing ####################
+
+def load_knowledge_graph(graph=None, graph_path=None, directed=False, sep=None,
+                         source_col=0, target_col=1, header=None, comment="#",
+                         simplify=True):
+    """
+    Load a pathway or custom knowledge graph as an igraph.Graph.
+
+    Parameters
+    ----------
+    graph : igraph.Graph, optional
+        Existing graph object. If provided, it is returned after optional
+        simplification.
+    graph_path : str, optional
+        Path to a graph file. Supported formats are GraphML/GraphHML and edge
+        lists with extensions .txt, .tsv, .csv, .edgelist, or .edges.
+        For edge-list files, each row should contain at least a source node and
+        a target node, for example: ``source target``.
+    directed : bool, default False
+        Whether to preserve directed edges for edge-list inputs. Current PathNet
+        model construction treats the graph as a topological prior, so the
+        default is undirected.
+    sep : str, optional
+        Separator passed to pandas.read_csv for edge-list files. If omitted,
+        .csv uses comma, .tsv uses tab, and text edge lists accept whitespace or
+        comma separators.
+    source_col, target_col : int or str
+        Columns containing source and target node identifiers.
+    header : int, optional
+        Header row for pandas.read_csv. By default, edge-list files are treated
+        as headerless.
+    comment : str, default "#"
+        Comment prefix for edge-list files.
+    simplify : bool, default True
+        Remove duplicate edges and loops.
+    """
+    if graph is not None:
+        if not isinstance(graph, ig.Graph):
+            raise TypeError("graph must be an igraph.Graph instance.")
+        loaded_graph = graph.copy()
+    else:
+        if graph_path is None:
+            graph_path = os.path.join(package_dir, "data", "graph.graphhml")
+
+        graph_path = os.path.expanduser(str(graph_path))
+        suffix = os.path.splitext(graph_path)[1].lower()
+
+        if suffix in {".graphml", ".graphhml"}:
+            loaded_graph = ig.Graph.Read_GraphML(graph_path)
+            if not directed and loaded_graph.is_directed():
+                loaded_graph = loaded_graph.as_undirected()
+        elif suffix in {".txt", ".tsv", ".csv", ".edgelist", ".edges"}:
+            if sep is None:
+                if suffix == ".csv":
+                    sep = ","
+                elif suffix == ".tsv":
+                    sep = "\t"
+                else:
+                    sep = r"[\s,]+"
+
+            edge_table = pd.read_csv(
+                graph_path,
+                sep=sep,
+                header=header,
+                comment=comment,
+                engine="python",
+            )
+            if edge_table.shape[1] < 2:
+                raise ValueError("Edge-list graph files must contain at least two columns.")
+
+            source = edge_table[source_col]
+            target = edge_table[target_col]
+            edge_frame = pd.DataFrame({"source": source, "target": target}).dropna()
+            edges = list(zip(edge_frame["source"].astype(str), edge_frame["target"].astype(str)))
+            loaded_graph = ig.Graph.TupleList(edges, directed=directed, vertex_name_attr="name")
+        else:
+            raise ValueError(
+                "Unsupported graph format. Use GraphML/GraphHML or a txt/tsv/csv edge list."
+            )
+
+    if "name" not in loaded_graph.vs.attributes():
+        loaded_graph.vs["name"] = [str(i) for i in range(loaded_graph.vcount())]
+
+    if simplify:
+        loaded_graph.simplify()
+
+    return loaded_graph
 
 # define a function to remove rows with more than 75% of zeros
 def remove_rows(dat, data, thres = 0.75):
@@ -107,10 +192,11 @@ def get_data(dic, new_dat, g):
 def data_preprocessing(pos=None, neg=None, 
                        pos_adductlist=["M+H","M+NH4","M+Na","M+ACN+H","M+ACN+Na","M+2ACN+H","2M+H","2M+Na","2M+ACN+H"], 
                        neg_adductlist = ["M-H", "M-2H", "M-2H+Na", "M-2H+K", "M-2H+NH4", "M-H2O-H", "M-H+Cl", "M+Cl", "M+2Cl"], 
-                       idx_feature = 4, match_tol_ppm=5, zero_threshold=0.75, log_transform=True, scale=1000):
+                       idx_feature = 4, match_tol_ppm=5, zero_threshold=0.75, log_transform=True, scale=1000,
+                       graph_path=None, knowledge_graph=None):
 
     # Load data
-    g = ig.Graph.Read_GraphML(os.path.join(package_dir, 'data', 'graph.graphhml'))
+    g = load_knowledge_graph(graph=knowledge_graph, graph_path=graph_path, directed=False)
     all_compound = list(g.vs["name"])
     
     # Filter out the lines in the DB where **(kegg['mz']-kegg['AdductMass']==kegg['MonoisotopicMass'])**.

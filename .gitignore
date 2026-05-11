@@ -70,6 +70,9 @@ target/
 # Jupyter Notebook
 .ipynb_checkpoints
 
+# PathNet generated data cache
+PathNet/data/kegg.txt
+
 # IPython
 profile_default/
 ipython_config.py
