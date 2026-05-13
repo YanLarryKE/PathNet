@@ -36,6 +36,7 @@ PathNet/
 example_meta.ipynb         # metabolomics workflow example
 example_gene.ipynb         # gene/miRNA workflow example
 docs/figures/              # representative manuscript figures
+docs/revision_evidence/    # derived revision benchmark/stress-test summaries
 ```
 
 `PathNet/data/kegg.txt.zip` is kept compressed to keep the repository smaller.
@@ -86,6 +87,10 @@ The example notebooks reference processed data generated for the manuscript
 analyses. Large raw and processed omics matrices are not bundled in this code
 repository; prepare them following the notebook format before running the full
 examples.
+
+Derived revision evidence, including benchmark, depth-sensitivity, prior-stress,
+and controlled-simulation summary tables, is available under
+`docs/revision_evidence/`.
 
 ## Custom Knowledge Graphs
 

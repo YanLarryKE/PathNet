@@ -1,0 +1,302 @@
+{
+  "purpose": "Real-data black-box MLP and efficient-KAN benchmark for the rebuttal.",
+  "mode": "full",
+  "command": "docs/revision_evidence/model_benchmark/scripts/real_data_mlp_kan.py --mode full",
+  "device": "cuda",
+  "seeds": [
+    2781,
+    14526,
+    2027,
+    3407,
+    91011
+  ],
+  "datasets": {
+    "covid_full": {
+      "n_samples": 605,
+      "n_features": 1174,
+      "class_counts": {
+        "0": 236,
+        "1": 369
+      },
+      "label_definition": "cov == Yes and icu Yes vs No; Yes encoded as 1",
+      "notebook_reference": "example_meta.ipynb",
+      "target_keggids": [
+        "C00328",
+        "C00186",
+        "C00584",
+        "C02165",
+        "C00696",
+        "C01089",
+        "C00042",
+        "C06124",
+        "C00249",
+        "C00780"
+      ],
+      "n_matched_metabolites": 913,
+      "feature_definition": "all LC-MS measured features retained by PathNet preprocessing"
+    },
+    "covid_selected": {
+      "n_samples": 605,
+      "n_features": 27,
+      "class_counts": {
+        "0": 236,
+        "1": 369
+      },
+      "label_definition": "cov == Yes and icu Yes vs No; Yes encoded as 1",
+      "notebook_reference": "example_meta.ipynb",
+      "target_keggids": [
+        "C00328",
+        "C00186",
+        "C00584",
+        "C02165",
+        "C00696",
+        "C01089",
+        "C00042",
+        "C06124",
+        "C00249",
+        "C00780"
+      ],
+      "n_matched_metabolites": 913,
+      "feature_definition": "measured LC-MS features mapped to the 10 target KEGG IDs in example_meta.ipynb",
+      "n_selected_target_keggids_present": 10,
+      "selected_target_keggids_present": [
+        "C00042",
+        "C00186",
+        "C00249",
+        "C00328",
+        "C00584",
+        "C00696",
+        "C00780",
+        "C01089",
+        "C02165",
+        "C06124"
+      ]
+    },
+    "brca_full": {
+      "n_samples": 760,
+      "n_features": 8857,
+      "class_counts": {
+        "0": 173,
+        "1": 587
+      },
+      "label_definition": "ER_Status_nature2012 Positive vs Negative; Indeterminate excluded; Positive encoded as 1",
+      "notebook_reference": "example_gene.ipynb",
+      "target_genes": [
+        "OPRK1",
+        "CAMKV",
+        "MAGEB4",
+        "CNGB1",
+        "TLX3",
+        "SCEL",
+        "NR2E1",
+        "CCKBR",
+        "FETUB",
+        "KCNJ3",
+        "LIN28B",
+        "PDX1",
+        "PRKAG3",
+        "GHRHR",
+        "TRIM10",
+        "FOXG1",
+        "GSTA5",
+        "MAGEA4",
+        "AHSG",
+        "TUBA3C",
+        "PYY",
+        "ALPP",
+        "SERPINB4",
+        "C1orf94",
+        "GPR139",
+        "TEKT1",
+        "GHRH",
+        "PSKH2"
+      ],
+      "n_network_genes_after_filtering": 8523,
+      "n_mirnas_after_filtering": 334,
+      "feature_definition": "all notebook-retained network genes concatenated with filtered miRNAs"
+    },
+    "brca_selected": {
+      "n_samples": 760,
+      "n_features": 63,
+      "class_counts": {
+        "0": 173,
+        "1": 587
+      },
+      "label_definition": "ER_Status_nature2012 Positive vs Negative; Indeterminate excluded; Positive encoded as 1",
+      "notebook_reference": "example_gene.ipynb",
+      "target_genes": [
+        "OPRK1",
+        "CAMKV",
+        "MAGEB4",
+        "CNGB1",
+        "TLX3",
+        "SCEL",
+        "NR2E1",
+        "CCKBR",
+        "FETUB",
+        "KCNJ3",
+        "LIN28B",
+        "PDX1",
+        "PRKAG3",
+        "GHRHR",
+        "TRIM10",
+        "FOXG1",
+        "GSTA5",
+        "MAGEA4",
+        "AHSG",
+        "TUBA3C",
+        "PYY",
+        "ALPP",
+        "SERPINB4",
+        "C1orf94",
+        "GPR139",
+        "TEKT1",
+        "GHRH",
+        "PSKH2"
+      ],
+      "n_network_genes_after_filtering": 8523,
+      "n_mirnas_after_filtering": 334,
+      "feature_definition": "28 target genes from example_gene.ipynb plus filtered miRNAs mapped to those target genes",
+      "selected_target_genes_present": [
+        "OPRK1",
+        "CAMKV",
+        "MAGEB4",
+        "CNGB1",
+        "TLX3",
+        "SCEL",
+        "NR2E1",
+        "CCKBR",
+        "FETUB",
+        "KCNJ3",
+        "LIN28B",
+        "PDX1",
+        "PRKAG3",
+        "GHRHR",
+        "TRIM10",
+        "FOXG1",
+        "GSTA5",
+        "MAGEA4",
+        "AHSG",
+        "TUBA3C",
+        "PYY",
+        "ALPP",
+        "SERPINB4",
+        "C1orf94",
+        "GPR139",
+        "TEKT1",
+        "GHRH",
+        "PSKH2"
+      ],
+      "n_selected_mirnas_mapped_to_target_genes": 35
+    }
+  },
+  "configs": [
+    {
+      "model": "mlp",
+      "architecture": "mlp_64",
+      "hidden_layers": [
+        64
+      ],
+      "dropout": 0.1,
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 32,
+      "max_epochs": 120,
+      "patience": 15,
+      "kan_grid_size": null,
+      "kan_spline_order": null,
+      "selected_features": null
+    },
+    {
+      "model": "mlp",
+      "architecture": "mlp_128_64",
+      "hidden_layers": [
+        128,
+        64
+      ],
+      "dropout": 0.2,
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 32,
+      "max_epochs": 120,
+      "patience": 15,
+      "kan_grid_size": null,
+      "kan_spline_order": null,
+      "selected_features": null
+    },
+    {
+      "model": "mlp",
+      "architecture": "mlp_256_128_64",
+      "hidden_layers": [
+        256,
+        128,
+        64
+      ],
+      "dropout": 0.3,
+      "learning_rate": 0.0007,
+      "weight_decay": 0.0001,
+      "batch_size": 32,
+      "max_epochs": 140,
+      "patience": 18,
+      "kan_grid_size": null,
+      "kan_spline_order": null,
+      "selected_features": null
+    },
+    {
+      "model": "kan",
+      "architecture": "kan_16_g3",
+      "hidden_layers": [
+        16
+      ],
+      "dropout": 0.0,
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 32,
+      "max_epochs": 90,
+      "patience": 12,
+      "kan_grid_size": 3,
+      "kan_spline_order": 2,
+      "selected_features": null
+    },
+    {
+      "model": "kan",
+      "architecture": "kan_32_g3",
+      "hidden_layers": [
+        32
+      ],
+      "dropout": 0.0,
+      "learning_rate": 0.0007,
+      "weight_decay": 0.0001,
+      "batch_size": 32,
+      "max_epochs": 90,
+      "patience": 12,
+      "kan_grid_size": 3,
+      "kan_spline_order": 2,
+      "selected_features": null
+    },
+    {
+      "model": "kan",
+      "architecture": "kan_32_16_g3",
+      "hidden_layers": [
+        32,
+        16
+      ],
+      "dropout": 0.0,
+      "learning_rate": 0.0007,
+      "weight_decay": 0.0001,
+      "batch_size": 32,
+      "max_epochs": 100,
+      "patience": 14,
+      "kan_grid_size": 3,
+      "kan_spline_order": 2,
+      "selected_features": null
+    }
+  ],
+  "kan_backend": "efficient-kan installed from https://github.com/Blealtan/efficient-kan.git",
+  "notes": [
+    "BRCA Indeterminate ER labels are excluded for a clean binary benchmark.",
+    "COVID labels and target KEGG IDs follow example_meta.ipynb.",
+    "BRCA preprocessing and target genes follow example_gene.ipynb.",
+    "Selected black-box features are direct measured/mapped features associated with the paper's target features."
+  ]
+}

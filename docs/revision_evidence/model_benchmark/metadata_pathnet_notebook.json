@@ -1,0 +1,115 @@
+{
+  "purpose": "PathNet notebook experiments rerun under the benchmark external train/validation/test evaluation setting.",
+  "mode": "notebook",
+  "command": "docs/revision_evidence/model_benchmark/scripts/real_data_pathnet.py --mode notebook --log-every 25",
+  "device": "cuda",
+  "split": "Stratified 60/20/20 train/validation/test split, using the run seed for the first split and seed+17 for validation split.",
+  "model_training": "Fixed epoch training with Adam and no early stopping, following the notebooks.",
+  "datasets": {
+    "covid": {
+      "label_definition": "cov == Yes and ICU Yes vs No; ICU Yes encoded as 1",
+      "notebook_reference": "example_meta.ipynb",
+      "n_samples": 605,
+      "n_input_features": 1174,
+      "n_pathway_nodes": 913,
+      "class_counts": {
+        "0": 236,
+        "1": 369
+      },
+      "target_keggids": [
+        "C00328",
+        "C00186",
+        "C00584",
+        "C02165",
+        "C00696",
+        "C01089",
+        "C00042",
+        "C06124",
+        "C00249",
+        "C00780"
+      ],
+      "preprocessing": "PathNet data_preprocessing with match_tol_ppm=9, zero_threshold=0.75, scale=True."
+    },
+    "brca": {
+      "label_definition": "ER_Status_nature2012 non-missing labels; Positive encoded as 1 and all other non-missing labels encoded as 0, matching example_gene.ipynb.",
+      "notebook_reference": "example_gene.ipynb",
+      "n_samples": 762,
+      "n_input_features": 8857,
+      "n_network_genes_after_filtering": 8523,
+      "n_mirnas_after_filtering": 334,
+      "n_mirna_gene_links": 58911,
+      "class_counts": {
+        "0": 175,
+        "1": 587
+      },
+      "er_status_counts": {
+        "Positive": 587,
+        "Negative": 173,
+        "Indeterminate": 2
+      },
+      "target_genes": [
+        "OPRK1",
+        "CAMKV",
+        "MAGEB4",
+        "CNGB1",
+        "TLX3",
+        "SCEL",
+        "NR2E1",
+        "CCKBR",
+        "FETUB",
+        "KCNJ3",
+        "LIN28B",
+        "PDX1",
+        "PRKAG3",
+        "GHRHR",
+        "TRIM10",
+        "FOXG1",
+        "GSTA5",
+        "MAGEA4",
+        "AHSG",
+        "TUBA3C",
+        "PYY",
+        "ALPP",
+        "SERPINB4",
+        "C1orf94",
+        "GPR139",
+        "TEKT1",
+        "GHRH",
+        "PSKH2"
+      ],
+      "preprocessing": "Network-gene and miRNA filtering follow example_gene.ipynb; no external StandardScaler is applied."
+    }
+  },
+  "configs": [
+    {
+      "dataset": "covid",
+      "seed": 14526,
+      "maximum_step": 2,
+      "hidden_layers": [],
+      "dropout": 0.1,
+      "learning_rate": 0.001,
+      "weight_decay": 0.0,
+      "batch_size": 16,
+      "max_epochs": 200,
+      "notebook_reference": "example_meta.ipynb"
+    },
+    {
+      "dataset": "brca",
+      "seed": 2781,
+      "maximum_step": 2,
+      "hidden_layers": [],
+      "dropout": 0.1,
+      "learning_rate": 0.001,
+      "weight_decay": 0.0,
+      "batch_size": 16,
+      "max_epochs": 100,
+      "notebook_reference": "example_gene.ipynb"
+    }
+  ],
+  "notes": [
+    "COVID preprocessing and labels follow example_meta.ipynb.",
+    "BRCA preprocessing and labels follow example_gene.ipynb, including coding all non-missing non-Positive ER labels as 0.",
+    "No extra StandardScaler is applied beyond the preprocessing already present in the notebooks.",
+    "The reported test metrics are held-out metrics from the external benchmark split, not training accuracy."
+  ]
+}
